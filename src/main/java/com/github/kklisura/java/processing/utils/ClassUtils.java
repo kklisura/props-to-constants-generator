@@ -41,20 +41,25 @@ import org.apache.commons.text.StringSubstitutor;
  * @author Kenan Klisura
  */
 public final class ClassUtils {
-  private static final String CLASS =
-      "${packageDeclaration}"
-          + "\n"
-          + "import javax.annotation.Generated;\n"
-          + "\n"
-          + "@Generated(value = \"${processorName}\")\n"
-          + "public final class ${className} {\n"
-          + "\n"
-          + "${constantsDeclarations}"
-          + "\n"
-          + "}\n";
-
   private static final String TAB = "\t";
   private static final String NEWLINE = "\r\n";
+
+  private static final String CLASS =
+      "${packageDeclaration}"
+          + NEWLINE
+          + "import javax.annotation.Generated;"
+          + NEWLINE
+          + NEWLINE
+          + "@Generated(value = \"${processorName}\")"
+          + NEWLINE
+          + "public final class ${className} {"
+          + NEWLINE
+          + "${constantsDeclarations}"
+          + NEWLINE
+          + TAB
+          + "private ${className}() {}"
+          + NEWLINE
+          + "}\n";
 
   private static final String CONSTANT_DEFINITION =
       TAB + "public static final String ${name} = \"${value}\";" + NEWLINE;
