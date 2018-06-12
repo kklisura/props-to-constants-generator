@@ -1,4 +1,4 @@
-package com.github.kklisura.java.processing.utils;
+package com.github.kklisura.java.processing.support.impl;
 
 /*-
  * #%L
@@ -26,32 +26,40 @@ package com.github.kklisura.java.processing.utils;
  * #L%
  */
 
+import static com.github.kklisura.java.processing.utils.ClassUtils.buildConstantsClass;
+
+import com.github.kklisura.java.processing.support.ClassWriter;
+import com.github.kklisura.java.processing.utils.IoUtils;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Set;
+import javax.annotation.processing.Filer;
+import javax.annotation.processing.ProcessingEnvironment;
 
 /**
- * IO related utils.
+ * Class writer implementation.
  *
  * @author Kenan Klisura
  */
-public final class IoUtils {
-  /** Private ctor. */
-  private IoUtils() {
-    // Empty ctor.
-  }
+public class ClassWriterImpl implements ClassWriter {
+  @Override
+  public void writeClass(
+      String packageName,
+      String className,
+      Set<String> propertyNames,
+      ProcessingEnvironment processingEnvironment)
+      throws IOException {
 
-  /**
-   * Flushes and closes the writer silently.
-   *
-   * @param classWriter Class writer.
-   */
-  public static void closeSilently(Writer classWriter) {
-    if (classWriter != null) {
-      try {
-        classWriter.close();
-      } catch (IOException e) {
-        // Ignore this exception
-      }
+    Writer classWriter = null;
+    try {
+      String name = packageName + "." + className;
+      Filer filer = processingEnvironment.getFiler();
+
+      classWriter = filer.createSourceFile(name).openWriter();
+
+      classWriter.write(buildConstantsClass(packageName, className, propertyNames));
+    } finally {
+      IoUtils.closeSilently(classWriter);
     }
   }
 }

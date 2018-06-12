@@ -1,4 +1,4 @@
-package com.github.kklisura.java.processing.utils;
+package com.github.kklisura.java.processing.support;
 
 /*-
  * #%L
@@ -27,31 +27,27 @@ package com.github.kklisura.java.processing.utils;
  */
 
 import java.io.IOException;
-import java.io.Writer;
+import java.util.Set;
+import javax.annotation.processing.ProcessingEnvironment;
 
 /**
- * IO related utils.
+ * Class writer.
  *
  * @author Kenan Klisura
  */
-public final class IoUtils {
-  /** Private ctor. */
-  private IoUtils() {
-    // Empty ctor.
-  }
-
+public interface ClassWriter {
   /**
-   * Flushes and closes the writer silently.
+   * Writes a constants class given a class attributes.
    *
-   * @param classWriter Class writer.
+   * @param packageName Class package name.
+   * @param className Class name.
+   * @param propertyNames Property names.
+   * @param processingEnvironment Processing env.
    */
-  public static void closeSilently(Writer classWriter) {
-    if (classWriter != null) {
-      try {
-        classWriter.close();
-      } catch (IOException e) {
-        // Ignore this exception
-      }
-    }
-  }
+  void writeClass(
+      String packageName,
+      String className,
+      Set<String> propertyNames,
+      ProcessingEnvironment processingEnvironment)
+      throws IOException;
 }

@@ -1,0 +1,10 @@
+package com.github.kklisura;
+
+import javax.annotation.Generated;
+
+@Generated(value = "com.github.kklisura.java.processing.PropertySourceConstantsAnnotationProcessor")
+public final class MyClass {
+	public static final String HELLO = "hello";
+
+	private MyClass() {}
+}

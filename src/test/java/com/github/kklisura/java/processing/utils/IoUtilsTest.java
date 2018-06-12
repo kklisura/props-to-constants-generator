@@ -26,32 +26,31 @@ package com.github.kklisura.java.processing.utils;
  * #L%
  */
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Writer;
+import org.junit.Test;
 
 /**
- * IO related utils.
+ * Test for io utils.
  *
  * @author Kenan Klisura
  */
-public final class IoUtils {
-  /** Private ctor. */
-  private IoUtils() {
-    // Empty ctor.
-  }
+public class IoUtilsTest {
+  @Test
+  public void testCloseSilently() throws IOException {
+    IoUtils.closeSilently(null);
+    IoUtils.closeSilently(new FileWriter(File.createTempFile("props-to-constants-test", "writer")));
 
-  /**
-   * Flushes and closes the writer silently.
-   *
-   * @param classWriter Class writer.
-   */
-  public static void closeSilently(Writer classWriter) {
-    if (classWriter != null) {
-      try {
-        classWriter.close();
-      } catch (IOException e) {
-        // Ignore this exception
-      }
-    }
+    File writer = File.createTempFile("props-to-constants-test", "writer");
+    writer.delete();
+
+    IoUtils.closeSilently(new FileWriter(writer));
+
+    File writer2 = File.createTempFile("props-to-constants-test", "writer");
+    FileWriter fileWriter2 = new FileWriter(writer2);
+    fileWriter2.close();
+
+    IoUtils.closeSilently(fileWriter2);
   }
 }

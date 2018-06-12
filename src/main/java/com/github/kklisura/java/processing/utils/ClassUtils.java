@@ -27,8 +27,6 @@ package com.github.kklisura.java.processing.utils;
  */
 
 import com.github.kklisura.java.processing.PropertySourceConstantsAnnotationProcessor;
-import java.io.IOException;
-import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -42,7 +40,7 @@ import org.apache.commons.text.StringSubstitutor;
  */
 public final class ClassUtils {
   private static final String TAB = "\t";
-  private static final String NEWLINE = "\r\n";
+  private static final String NEWLINE = "\n";
 
   private static final String CLASS =
       "${packageDeclaration}"
@@ -59,26 +57,15 @@ public final class ClassUtils {
           + TAB
           + "private ${className}() {}"
           + NEWLINE
-          + "}\n";
+          + "}"
+          + NEWLINE;
 
   private static final String CONSTANT_DEFINITION =
       TAB + "public static final String ${name} = \"${value}\";" + NEWLINE;
 
-  /**
-   * Writes a properties constants class.
-   *
-   * @param classWriter Output file writer.
-   * @param packageName Package name.
-   * @param className Class name.
-   * @param propertyNames Set of property names.
-   */
-  public static void writePropertiesConstantsClass(
-      final Writer classWriter,
-      final String packageName,
-      final String className,
-      final Set<String> propertyNames)
-      throws IOException {
-    classWriter.write(buildConstantsClass(packageName, className, propertyNames));
+  /** Private ctor. */
+  private ClassUtils() {
+    // Empty ctor.
   }
 
   /**
@@ -113,13 +100,10 @@ public final class ClassUtils {
 
     for (final String propertyName : propertyNames) {
       if (StringUtils.isNotEmpty(propertyName)) {
-        Map<String, String> params =
-            new HashMap<String, String>() {
-              {
-                put("name", propertyNameToConstantName(propertyName));
-                put("value", propertyName);
-              }
-            };
+        Map<String, String> params = new HashMap<>();
+
+        params.put("name", propertyNameToConstantName(propertyName));
+        params.put("value", propertyName);
 
         StringSubstitutor substitutor = new StringSubstitutor(params);
         stringBuilder.append(substitutor.replace(CONSTANT_DEFINITION));

@@ -1,4 +1,4 @@
-package com.github.kklisura.java.processing.utils;
+package com.github.kklisura.java.processing.support;
 
 /*-
  * #%L
@@ -27,31 +27,22 @@ package com.github.kklisura.java.processing.utils;
  */
 
 import java.io.IOException;
-import java.io.Writer;
+import java.util.Properties;
+import javax.annotation.processing.ProcessingEnvironment;
 
 /**
- * IO related utils.
+ * Properties provider.
  *
  * @author Kenan Klisura
  */
-public final class IoUtils {
-  /** Private ctor. */
-  private IoUtils() {
-    // Empty ctor.
-  }
-
+public interface PropertiesProvider {
   /**
-   * Flushes and closes the writer silently.
+   * Loads a properties from given resource name.
    *
-   * @param classWriter Class writer.
+   * @param resourceName Resource name.
+   * @param processingEnv Processing env.
+   * @return Properties.
    */
-  public static void closeSilently(Writer classWriter) {
-    if (classWriter != null) {
-      try {
-        classWriter.close();
-      } catch (IOException e) {
-        // Ignore this exception
-      }
-    }
-  }
+  Properties loadProperties(String resourceName, ProcessingEnvironment processingEnv)
+      throws IOException;
 }

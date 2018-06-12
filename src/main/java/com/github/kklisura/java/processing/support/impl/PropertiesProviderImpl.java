@@ -1,4 +1,4 @@
-package com.github.kklisura.java.processing.utils;
+package com.github.kklisura.java.processing.support.impl;
 
 /*-
  * #%L
@@ -26,24 +26,33 @@ package com.github.kklisura.java.processing.utils;
  * #L%
  */
 
+import com.github.kklisura.java.processing.support.PropertiesProvider;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+import javax.annotation.processing.ProcessingEnvironment;
 import javax.tools.FileObject;
+import javax.tools.StandardLocation;
 
 /**
- * Properties file related utils.
+ * Properties provider implementation.
  *
  * @author Kenan Klisura
  */
-public final class PropertiesUtils {
-  /**
-   * Loads a properties from a given file.
-   *
-   * @param fileObject Input file object.
-   * @return Properties
-   */
-  public static Properties loadProperties(FileObject fileObject) {
+public class PropertiesProviderImpl implements PropertiesProvider {
+  private static final String EMPTY_PACKAGE = "";
+
+  @Override
+  public Properties loadProperties(String resourceName, ProcessingEnvironment processingEnv)
+      throws IOException {
+    FileObject resource =
+        processingEnv
+            .getFiler()
+            .getResource(StandardLocation.CLASS_OUTPUT, EMPTY_PACKAGE, resourceName);
+    return loadProperties(resource);
+  }
+
+  private Properties loadProperties(FileObject fileObject) {
     Properties properties = new Properties();
 
     InputStream inputStream = null;

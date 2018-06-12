@@ -26,20 +26,18 @@ package com.github.kklisura.java.processing;
  * #L%
  */
 
-import static com.github.kklisura.java.processing.utils.PropertiesUtils.loadProperties;
-
 import com.github.kklisura.java.processing.annotations.PropertySourceConstants;
 import com.github.kklisura.java.processing.annotations.PropertySourceConstantsContainer;
-import com.github.kklisura.java.processing.utils.ClassUtils;
-import com.github.kklisura.java.processing.utils.IoUtils;
+import com.github.kklisura.java.processing.support.ClassWriter;
+import com.github.kklisura.java.processing.support.PropertiesProvider;
+import com.github.kklisura.java.processing.support.impl.ClassWriterImpl;
+import com.github.kklisura.java.processing.support.impl.PropertiesProviderImpl;
 import java.io.IOException;
-import java.io.Writer;
 import java.lang.annotation.Annotation;
 import java.text.MessageFormat;
 import java.util.Properties;
 import java.util.Set;
 import javax.annotation.processing.AbstractProcessor;
-import javax.annotation.processing.Filer;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
@@ -48,8 +46,6 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic.Kind;
-import javax.tools.FileObject;
-import javax.tools.StandardLocation;
 
 /**
  * PropertySourceConstants annotation processor.
@@ -62,11 +58,22 @@ import javax.tools.StandardLocation;
   "com.github.kklisura.java.processing.annotations.PropertySourceConstantsContainer"
 })
 public class PropertySourceConstantsAnnotationProcessor extends AbstractProcessor {
-  private static final String EMPTY_PACKAGE = "";
+  private ClassWriter classWriter;
+  private PropertiesProvider propertiesProvider;
+
+  public PropertySourceConstantsAnnotationProcessor() {
+    this(new ClassWriterImpl(), new PropertiesProviderImpl());
+  }
+
+  public PropertySourceConstantsAnnotationProcessor(
+      ClassWriter classWriter, PropertiesProvider propertiesProvider) {
+    this.classWriter = classWriter;
+    this.propertiesProvider = propertiesProvider;
+  }
 
   @Override
   public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-    if (roundEnv.processingOver() || annotations.size() == 0) {
+    if (roundEnv.processingOver() || annotations.isEmpty()) {
       return false;
     }
 
@@ -123,18 +130,11 @@ public class PropertySourceConstantsAnnotationProcessor extends AbstractProcesso
 
   private void processPropertySourceConstants(
       String packageName, PropertySourceConstants annotation) {
-    Writer classWriter = null;
-
     try {
-      Filer filer = processingEnv.getFiler();
-      String name = packageName + "." + annotation.className();
-
-      classWriter = filer.createSourceFile(name).openWriter();
-
-      Properties properties = loadPropertiesFromResource(annotation, filer);
-
-      ClassUtils.writePropertiesConstantsClass(
-          classWriter, packageName, annotation.className(), properties.stringPropertyNames());
+      Properties properties =
+          propertiesProvider.loadProperties(annotation.resourceName(), processingEnv);
+      classWriter.writeClass(
+          packageName, annotation.className(), properties.stringPropertyNames(), processingEnv);
 
       processingEnv
           .getMessager()
@@ -145,18 +145,10 @@ public class PropertySourceConstantsAnnotationProcessor extends AbstractProcesso
     } catch (IOException e) {
       processingEnv.getMessager().printMessage(Kind.ERROR, e.getMessage());
       throw new RuntimeException("Failed reading resource " + annotation.resourceName(), e);
-    } finally {
-      IoUtils.closeSilently(classWriter);
     }
   }
 
-  private Properties loadPropertiesFromResource(PropertySourceConstants annotation, Filer filer)
-      throws IOException {
-    FileObject resource =
-        filer.getResource(StandardLocation.CLASS_OUTPUT, EMPTY_PACKAGE, annotation.resourceName());
-    return loadProperties(resource);
-  }
-
+  @FunctionalInterface
   private interface AnnotatedElement {
     void apply(String packageName, Element element);
   }

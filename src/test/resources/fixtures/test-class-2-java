@@ -1,0 +1,11 @@
+package com.github.kklisura.test;
+
+import javax.annotation.Generated;
+
+@Generated(value = "com.github.kklisura.java.processing.PropertySourceConstantsAnnotationProcessor")
+public final class TestClass {
+	public static final String MY_PROPERTY_1 = "my.property.1";
+	public static final String MY_PROPERTY_2 = "my.property.2";
+
+	private TestClass() {}
+}

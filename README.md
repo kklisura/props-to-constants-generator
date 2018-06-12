@@ -1,0 +1,1 @@
+# props-to-constants-generator
