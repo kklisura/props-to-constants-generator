@@ -147,6 +147,7 @@ public class PropertySourceConstantsAnnotationProcessorTest extends EasyMockSupp
         .andReturn("my-properties-file.properties")
         .times(2);
     expect(propertySourceConstants.className()).andReturn("MyTestClass").times(2);
+    expect(propertySourceConstants.stripPrefix()).andReturn(null).times(1);
 
     Properties properties = new Properties();
     properties.setProperty("test", "hello");
@@ -160,6 +161,48 @@ public class PropertySourceConstantsAnnotationProcessorTest extends EasyMockSupp
 
     classWriter.writeClass(
         "com.github.kklisura", "MyTestClass", set("test.me", "test"), processingEnv);
+
+    replayAll();
+
+    assertEquals(false, processor.process(annotationsSet(), roundEnv));
+
+    verifyAll();
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void testProcessPropertySourceConstantsAnnotationWithStrippedKeys() throws IOException {
+    setupProcessingEnvironment();
+    setupRoundEnvironment();
+
+    setupPackageElement("com.github.kklisura");
+
+    expect(roundEnv.getElementsAnnotatedWith(PropertySourceConstants.class))
+        .andReturn(elementSet());
+
+    expect(roundEnv.getElementsAnnotatedWith(PropertySourceConstantsContainer.class))
+        .andReturn(Collections.emptySet());
+
+    expect(typeElement.getAnnotationsByType(PropertySourceConstants.class))
+        .andReturn(new PropertySourceConstants[] {propertySourceConstants});
+
+    expect(propertySourceConstants.resourceName())
+        .andReturn("my-properties-file.properties")
+        .times(2);
+    expect(propertySourceConstants.className()).andReturn("MyTestClass").times(2);
+    expect(propertySourceConstants.stripPrefix()).andReturn("test").times(1);
+
+    Properties properties = new Properties();
+    properties.setProperty("test", "hello");
+    properties.setProperty("test.me", "hello.world");
+
+    expect(propertiesProvider.loadProperties("my-properties-file.properties", processingEnv))
+        .andReturn(properties);
+
+    expect(processingEnv.getMessager()).andReturn(messager);
+    messager.printMessage(Kind.OTHER, "Generated MyTestClass for my-properties-file.properties");
+
+    classWriter.writeClass("com.github.kklisura", "MyTestClass", set("me"), processingEnv);
 
     replayAll();
 
@@ -228,6 +271,7 @@ public class PropertySourceConstantsAnnotationProcessorTest extends EasyMockSupp
         .andReturn("my-properties-file.properties")
         .times(2);
     expect(propertySourceConstants.className()).andReturn("MyTestClass").times(2);
+    expect(propertySourceConstants.stripPrefix()).andReturn(null).times(1);
 
     Properties properties = new Properties();
     properties.setProperty("test", "hello");

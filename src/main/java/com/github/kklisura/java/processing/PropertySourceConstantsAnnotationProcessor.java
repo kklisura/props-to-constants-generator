@@ -37,6 +37,7 @@ import java.lang.annotation.Annotation;
 import java.text.MessageFormat;
 import java.util.Properties;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
@@ -46,6 +47,7 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic.Kind;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * PropertySourceConstants annotation processor.
@@ -133,8 +135,9 @@ public class PropertySourceConstantsAnnotationProcessor extends AbstractProcesso
     try {
       Properties properties =
           propertiesProvider.loadProperties(annotation.resourceName(), processingEnv);
-      classWriter.writeClass(
-          packageName, annotation.className(), properties.stringPropertyNames(), processingEnv);
+      final Set<String> propertyNames =
+          stripPropertyKeys(properties.stringPropertyNames(), annotation);
+      classWriter.writeClass(packageName, annotation.className(), propertyNames, processingEnv);
 
       processingEnv
           .getMessager()
@@ -146,6 +149,32 @@ public class PropertySourceConstantsAnnotationProcessor extends AbstractProcesso
       processingEnv.getMessager().printMessage(Kind.ERROR, e.getMessage());
       throw new RuntimeException("Failed reading resource " + annotation.resourceName(), e);
     }
+  }
+
+  private Set<String> stripPropertyKeys(
+      Set<String> existingPropertyKeys, PropertySourceConstants annotation) {
+    final String prefix = annotation.stripPrefix();
+    if (StringUtils.isBlank(prefix)) {
+      return existingPropertyKeys;
+    }
+
+    return existingPropertyKeys
+        .stream()
+        .map(key -> stripPropertyKey(key, prefix))
+        .filter(StringUtils::isNotBlank)
+        .collect(Collectors.toSet());
+  }
+
+  private String stripPropertyKey(String existingKey, String prefix) {
+    if (existingKey.startsWith(prefix)) {
+      if (existingKey.length() <= prefix.length()) {
+        return null;
+      }
+
+      return existingKey.substring(prefix.length() + 1);
+    }
+
+    return existingKey;
   }
 
   @FunctionalInterface

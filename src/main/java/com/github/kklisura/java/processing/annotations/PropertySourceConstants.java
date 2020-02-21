@@ -55,4 +55,11 @@ public @interface PropertySourceConstants {
    * @return Class name.
    */
   String className();
+
+  /**
+   * Strips the prefix from property keys.
+   *
+   * @return A prefix to be stripped.
+   */
+  String stripPrefix();
 }
