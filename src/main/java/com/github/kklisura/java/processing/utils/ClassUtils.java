@@ -60,8 +60,43 @@ public final class ClassUtils {
           + "}"
           + NEWLINE;
 
+  private static final String ENUM =
+      "${packageDeclaration}"
+          + NEWLINE
+          + "import javax.annotation.processing.Generated;"
+          + NEWLINE
+          + NEWLINE
+          + "@Generated(value = \"${processorName}\")"
+          + NEWLINE
+          + "public enum ${className} {"
+          + NEWLINE
+          + "${enumDeclarations}"
+          + TAB
+          + ";"
+          + NEWLINE
+          + NEWLINE
+          + TAB
+          + "private String key;"
+          + NEWLINE
+          + NEWLINE
+          + TAB
+          + "private ${className}(String key) { this.key = key; }"
+          + NEWLINE
+          + NEWLINE
+          + TAB
+          + "public String getKey() { return this.key; }"
+          + NEWLINE
+          + NEWLINE
+          + TAB
+          + "public String fromBundle(java.util.ResourceBundle resourceBundle) { return resourceBundle.getString(this.key); }"
+          + NEWLINE
+          + "}"
+          + NEWLINE;
+
   private static final String CONSTANT_DEFINITION =
       TAB + "public static final String ${name} = \"${value}\";" + NEWLINE;
+
+  private static final String ENUM_DEFINITION = TAB + "${name}(\"${value}\")," + NEWLINE;
 
   /** Private ctor. */
   private ClassUtils() {
@@ -89,6 +124,19 @@ public final class ClassUtils {
     return substitutor.replace(CLASS);
   }
 
+  public static String buildEnumClass(
+      String packageName, String className, Set<String> propertyNames) {
+    Map<String, String> params = new HashMap<>();
+
+    params.put("className", className);
+    params.put("processorName", PropertySourceConstantsAnnotationProcessor.class.getName());
+    params.put("enumDeclarations", buildEnumDeclarations(propertyNames));
+    params.put("packageDeclaration", buildPackageDeclaration(packageName));
+
+    StringSubstitutor substitutor = new StringSubstitutor(params);
+    return substitutor.replace(ENUM);
+  }
+
   /**
    * Build constants declarations string.
    *
@@ -107,6 +155,24 @@ public final class ClassUtils {
 
         StringSubstitutor substitutor = new StringSubstitutor(params);
         stringBuilder.append(substitutor.replace(CONSTANT_DEFINITION));
+      }
+    }
+
+    return stringBuilder.toString();
+  }
+
+  public static String buildEnumDeclarations(final Set<String> propertyNames) {
+    StringBuilder stringBuilder = new StringBuilder();
+
+    for (final String propertyName : propertyNames) {
+      if (StringUtils.isNotEmpty(propertyName)) {
+        Map<String, String> params = new HashMap<>();
+
+        params.put("name", propertyNameToConstantName(propertyName));
+        params.put("value", propertyName);
+
+        StringSubstitutor substitutor = new StringSubstitutor(params);
+        stringBuilder.append(substitutor.replace(ENUM_DEFINITION));
       }
     }
 

@@ -137,7 +137,8 @@ public class PropertySourceConstantsAnnotationProcessor extends AbstractProcesso
           propertiesProvider.loadProperties(annotation.resourceName(), processingEnv);
       final Set<String> propertyNames =
           stripPropertyKeys(properties.stringPropertyNames(), annotation);
-      classWriter.writeClass(packageName, annotation.className(), propertyNames, processingEnv);
+      classWriter.writeClass(
+          packageName, annotation.className(), propertyNames, annotation.style(), processingEnv);
 
       processingEnv
           .getMessager()

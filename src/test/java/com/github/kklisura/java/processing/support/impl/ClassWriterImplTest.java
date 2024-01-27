@@ -31,6 +31,7 @@ import static com.github.kklisura.java.processing.utils.TestUtils.readFile;
 import static org.easymock.EasyMock.expect;
 import static org.junit.Assert.assertEquals;
 
+import com.github.kklisura.java.processing.annotations.PropertySourceConstants;
 import com.github.kklisura.java.processing.support.ClassWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -83,6 +84,7 @@ public class ClassWriterImplTest extends EasyMockSupport {
         "com.github.kklisura.test",
         "TestClass",
         set("my.property.1", "my.property.2"),
+        PropertySourceConstants.Style.CONSTANTS,
         processingEnvironment);
 
     verifyAll();

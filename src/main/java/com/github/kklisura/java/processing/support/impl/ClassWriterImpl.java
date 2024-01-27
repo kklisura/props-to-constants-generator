@@ -27,7 +27,9 @@ package com.github.kklisura.java.processing.support.impl;
  */
 
 import static com.github.kklisura.java.processing.utils.ClassUtils.buildConstantsClass;
+import static com.github.kklisura.java.processing.utils.ClassUtils.buildEnumClass;
 
+import com.github.kklisura.java.processing.annotations.PropertySourceConstants;
 import com.github.kklisura.java.processing.support.ClassWriter;
 import com.github.kklisura.java.processing.utils.IoUtils;
 import java.io.IOException;
@@ -47,6 +49,7 @@ public class ClassWriterImpl implements ClassWriter {
       String packageName,
       String className,
       Set<String> propertyNames,
+      PropertySourceConstants.Style style,
       ProcessingEnvironment processingEnvironment)
       throws IOException {
 
@@ -62,7 +65,15 @@ public class ClassWriterImpl implements ClassWriter {
 
       classWriter = filer.createSourceFile(name).openWriter();
 
-      classWriter.write(buildConstantsClass(packageName, className, propertyNames));
+      switch (style) {
+        case CONSTANTS:
+          classWriter.write(buildConstantsClass(packageName, className, propertyNames));
+          break;
+        case ENUM:
+          classWriter.write(buildEnumClass(packageName, className, propertyNames));
+          break;
+      }
+
     } finally {
       IoUtils.closeSilently(classWriter);
     }
