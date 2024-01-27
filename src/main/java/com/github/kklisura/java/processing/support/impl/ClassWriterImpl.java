@@ -52,6 +52,11 @@ public class ClassWriterImpl implements ClassWriter {
 
     Writer classWriter = null;
     try {
+      int lastDot = className.lastIndexOf(".");
+      if (lastDot != -1) {
+        packageName = className.substring(0, lastDot);
+        className = className.substring(lastDot + 1);
+      }
       String name = packageName + "." + className;
       Filer filer = processingEnvironment.getFiler();
 
