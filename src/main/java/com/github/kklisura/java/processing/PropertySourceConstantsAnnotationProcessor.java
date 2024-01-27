@@ -54,7 +54,7 @@ import org.apache.commons.lang3.StringUtils;
  *
  * @author Kenan Klisura
  */
-@SupportedSourceVersion(SourceVersion.RELEASE_8)
+@SupportedSourceVersion(SourceVersion.RELEASE_11)
 @SupportedAnnotationTypes({
   "com.github.kklisura.java.processing.annotations.PropertySourceConstants",
   "com.github.kklisura.java.processing.annotations.PropertySourceConstantsContainer"
