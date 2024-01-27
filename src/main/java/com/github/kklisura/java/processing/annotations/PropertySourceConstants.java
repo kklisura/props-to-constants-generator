@@ -61,5 +61,5 @@ public @interface PropertySourceConstants {
    *
    * @return A prefix to be stripped.
    */
-  String stripPrefix();
+  String stripPrefix() default "";
 }
