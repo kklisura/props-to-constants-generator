@@ -45,7 +45,7 @@ public final class ClassUtils {
   private static final String CLASS =
       "${packageDeclaration}"
           + NEWLINE
-          + "import javax.annotation.Generated;"
+          + "import javax.annotation.processing.Generated;"
           + NEWLINE
           + NEWLINE
           + "@Generated(value = \"${processorName}\")"

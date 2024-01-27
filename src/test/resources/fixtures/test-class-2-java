@@ -1,6 +1,6 @@
 package com.github.kklisura.test;
 
-import javax.annotation.Generated;
+import javax.annotation.processing.Generated;
 
 @Generated(value = "com.github.kklisura.java.processing.PropertySourceConstantsAnnotationProcessor")
 public final class TestClass {
