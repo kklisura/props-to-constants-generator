@@ -35,9 +35,10 @@ import com.github.kklisura.java.processing.support.impl.PropertiesProviderImpl;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.text.MessageFormat;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.TreeMap;
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
@@ -135,10 +136,13 @@ public class PropertySourceConstantsAnnotationProcessor extends AbstractProcesso
     try {
       Properties properties =
           propertiesProvider.loadProperties(annotation.resourceName(), processingEnv);
-      final Set<String> propertyNames =
-          stripPropertyKeys(properties.stringPropertyNames(), annotation);
+      final Map<String, String> propertiesKeyValues = propertiesKeyValues(properties, annotation);
       classWriter.writeClass(
-          packageName, annotation.className(), propertyNames, annotation.style(), processingEnv);
+          packageName,
+          annotation.className(),
+          propertiesKeyValues,
+          annotation.style(),
+          processingEnv);
 
       processingEnv
           .getMessager()
@@ -152,18 +156,22 @@ public class PropertySourceConstantsAnnotationProcessor extends AbstractProcesso
     }
   }
 
-  private Set<String> stripPropertyKeys(
-      Set<String> existingPropertyKeys, PropertySourceConstants annotation) {
+  private Map<String, String> propertiesKeyValues(
+      Properties properties, PropertySourceConstants annotation) {
+    final Map<String, String> result = new TreeMap<>();
     final String prefix = annotation.stripPrefix();
-    if (StringUtils.isBlank(prefix)) {
-      return existingPropertyKeys;
-    }
 
-    return existingPropertyKeys
-        .stream()
-        .map(key -> stripPropertyKey(key, prefix))
-        .filter(StringUtils::isNotBlank)
-        .collect(Collectors.toSet());
+    for (String key : properties.stringPropertyNames()) {
+      if (StringUtils.isBlank(prefix)) {
+        result.put(key, properties.getProperty(key));
+      } else {
+        String strippedKey = stripPropertyKey(key, prefix);
+        if (StringUtils.isNotBlank(strippedKey)) {
+          result.put(strippedKey, properties.getProperty(key));
+        }
+      }
+    }
+    return result;
   }
 
   private String stripPropertyKey(String existingKey, String prefix) {

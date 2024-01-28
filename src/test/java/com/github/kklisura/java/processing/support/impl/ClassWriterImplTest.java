@@ -36,9 +36,8 @@ import com.github.kklisura.java.processing.support.ClassWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.tools.JavaFileObject;
@@ -92,7 +91,11 @@ public class ClassWriterImplTest extends EasyMockSupport {
     assertEquals(getFixture("test-class-2-java"), readFile(tmpFile));
   }
 
-  private static Set<String> set(String... items) {
-    return new LinkedHashSet<>(Arrays.asList(items));
+  private static Map<String, String> set(String... items) {
+    final Map<String, String> result = new LinkedHashMap<>();
+    for (int i = 0; i < items.length; i++) {
+      result.put(items[i], "Value " + (i + 1));
+    }
+    return result;
   }
 }

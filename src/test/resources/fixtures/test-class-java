@@ -4,6 +4,7 @@ import javax.annotation.processing.Generated;
 
 @Generated(value = "com.github.kklisura.java.processing.PropertySourceConstantsAnnotationProcessor")
 public final class MyClass {
+	/** Value 1 */
 	public static final String HELLO = "hello";
 
 	private MyClass() {}

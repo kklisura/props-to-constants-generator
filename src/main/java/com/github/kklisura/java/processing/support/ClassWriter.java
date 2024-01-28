@@ -28,7 +28,7 @@ package com.github.kklisura.java.processing.support;
 
 import com.github.kklisura.java.processing.annotations.PropertySourceConstants;
 import java.io.IOException;
-import java.util.Set;
+import java.util.Map;
 import javax.annotation.processing.ProcessingEnvironment;
 
 /**
@@ -48,7 +48,7 @@ public interface ClassWriter {
   void writeClass(
       String packageName,
       String className,
-      Set<String> propertyNames,
+      Map<String, String> properties,
       PropertySourceConstants.Style style,
       ProcessingEnvironment processingEnvironment)
       throws IOException;

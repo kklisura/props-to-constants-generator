@@ -34,7 +34,7 @@ import com.github.kklisura.java.processing.support.ClassWriter;
 import com.github.kklisura.java.processing.utils.IoUtils;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Set;
+import java.util.Map;
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.ProcessingEnvironment;
 
@@ -48,7 +48,7 @@ public class ClassWriterImpl implements ClassWriter {
   public void writeClass(
       String packageName,
       String className,
-      Set<String> propertyNames,
+      Map<String, String> properties,
       PropertySourceConstants.Style style,
       ProcessingEnvironment processingEnvironment)
       throws IOException {
@@ -67,10 +67,10 @@ public class ClassWriterImpl implements ClassWriter {
 
       switch (style) {
         case CONSTANTS:
-          classWriter.write(buildConstantsClass(packageName, className, propertyNames));
+          classWriter.write(buildConstantsClass(packageName, className, properties));
           break;
         case ENUM:
-          classWriter.write(buildEnumClass(packageName, className, propertyNames));
+          classWriter.write(buildEnumClass(packageName, className, properties));
           break;
       }
 

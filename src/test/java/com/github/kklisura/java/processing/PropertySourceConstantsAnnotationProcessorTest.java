@@ -36,9 +36,9 @@ import com.github.kklisura.java.processing.annotations.PropertySourceConstantsCo
 import com.github.kklisura.java.processing.support.ClassWriter;
 import com.github.kklisura.java.processing.support.PropertiesProvider;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedHashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import javax.annotation.processing.Filer;
@@ -163,7 +163,7 @@ public class PropertySourceConstantsAnnotationProcessorTest extends EasyMockSupp
     classWriter.writeClass(
         "com.github.kklisura",
         "MyTestClass",
-        set("test.me", "test"),
+        properties("test.me", "hello.world", "test", "hello"),
         PropertySourceConstants.Style.CONSTANTS,
         processingEnv);
 
@@ -211,7 +211,7 @@ public class PropertySourceConstantsAnnotationProcessorTest extends EasyMockSupp
     classWriter.writeClass(
         "com.github.kklisura",
         "MyTestClass",
-        set("me"),
+        properties("me", "hello.world"),
         PropertySourceConstants.Style.CONSTANTS,
         processingEnv);
 
@@ -298,7 +298,7 @@ public class PropertySourceConstantsAnnotationProcessorTest extends EasyMockSupp
     classWriter.writeClass(
         "com.github.kklisura",
         "MyTestClass",
-        set("test.me", "test"),
+        properties("test.me", "hello.world", "test", "hello"),
         PropertySourceConstants.Style.CONSTANTS,
         processingEnv);
 
@@ -359,7 +359,11 @@ public class PropertySourceConstantsAnnotationProcessorTest extends EasyMockSupp
     return Collections.singleton(typeElement);
   }
 
-  private static Set<String> set(String... items) {
-    return new LinkedHashSet<>(Arrays.asList(items));
+  private static Map<String, String> properties(String... items) {
+    final Map<String, String> result = new LinkedHashMap<>();
+    for (int i = 0; i < items.length; i += 2) {
+      result.put(items[i], items[i + 1]);
+    }
+    return result;
   }
 }
