@@ -88,7 +88,11 @@ public final class ClassUtils {
           + NEWLINE
           + NEWLINE
           + TAB
-          + "public String fromBundle(java.util.ResourceBundle resourceBundle) { return resourceBundle.getString(this.key); }"
+          + "public String from(java.util.ResourceBundle resourceBundle) { return resourceBundle.getString(this.key); }"
+          + NEWLINE
+          + NEWLINE
+          + TAB
+          + "public String from(java.util.Properties properties) { return properties.getProperty(this.key); }"
           + NEWLINE
           + "}"
           + NEWLINE;
