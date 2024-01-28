@@ -36,9 +36,9 @@ import com.github.kklisura.java.processing.annotations.PropertySourceConstantsCo
 import com.github.kklisura.java.processing.support.ClassWriter;
 import com.github.kklisura.java.processing.support.PropertiesProvider;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedHashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import javax.annotation.processing.Filer;
@@ -148,6 +148,7 @@ public class PropertySourceConstantsAnnotationProcessorTest extends EasyMockSupp
         .times(2);
     expect(propertySourceConstants.className()).andReturn("MyTestClass").times(2);
     expect(propertySourceConstants.stripPrefix()).andReturn(null).times(1);
+    expect(propertySourceConstants.style()).andReturn(PropertySourceConstants.Style.CONSTANTS);
 
     Properties properties = new Properties();
     properties.setProperty("test", "hello");
@@ -160,7 +161,11 @@ public class PropertySourceConstantsAnnotationProcessorTest extends EasyMockSupp
     messager.printMessage(Kind.OTHER, "Generated MyTestClass for my-properties-file.properties");
 
     classWriter.writeClass(
-        "com.github.kklisura", "MyTestClass", set("test.me", "test"), processingEnv);
+        "com.github.kklisura",
+        "MyTestClass",
+        properties("test.me", "hello.world", "test", "hello"),
+        PropertySourceConstants.Style.CONSTANTS,
+        processingEnv);
 
     replayAll();
 
@@ -191,6 +196,7 @@ public class PropertySourceConstantsAnnotationProcessorTest extends EasyMockSupp
         .times(2);
     expect(propertySourceConstants.className()).andReturn("MyTestClass").times(2);
     expect(propertySourceConstants.stripPrefix()).andReturn("test").times(1);
+    expect(propertySourceConstants.style()).andReturn(PropertySourceConstants.Style.CONSTANTS);
 
     Properties properties = new Properties();
     properties.setProperty("test", "hello");
@@ -202,7 +208,12 @@ public class PropertySourceConstantsAnnotationProcessorTest extends EasyMockSupp
     expect(processingEnv.getMessager()).andReturn(messager);
     messager.printMessage(Kind.OTHER, "Generated MyTestClass for my-properties-file.properties");
 
-    classWriter.writeClass("com.github.kklisura", "MyTestClass", set("me"), processingEnv);
+    classWriter.writeClass(
+        "com.github.kklisura",
+        "MyTestClass",
+        properties("me", "hello.world"),
+        PropertySourceConstants.Style.CONSTANTS,
+        processingEnv);
 
     replayAll();
 
@@ -272,6 +283,7 @@ public class PropertySourceConstantsAnnotationProcessorTest extends EasyMockSupp
         .times(2);
     expect(propertySourceConstants.className()).andReturn("MyTestClass").times(2);
     expect(propertySourceConstants.stripPrefix()).andReturn(null).times(1);
+    expect(propertySourceConstants.style()).andReturn(PropertySourceConstants.Style.CONSTANTS);
 
     Properties properties = new Properties();
     properties.setProperty("test", "hello");
@@ -284,7 +296,11 @@ public class PropertySourceConstantsAnnotationProcessorTest extends EasyMockSupp
     messager.printMessage(Kind.OTHER, "Generated MyTestClass for my-properties-file.properties");
 
     classWriter.writeClass(
-        "com.github.kklisura", "MyTestClass", set("test.me", "test"), processingEnv);
+        "com.github.kklisura",
+        "MyTestClass",
+        properties("test.me", "hello.world", "test", "hello"),
+        PropertySourceConstants.Style.CONSTANTS,
+        processingEnv);
 
     replayAll();
 
@@ -343,7 +359,11 @@ public class PropertySourceConstantsAnnotationProcessorTest extends EasyMockSupp
     return Collections.singleton(typeElement);
   }
 
-  private static Set<String> set(String... items) {
-    return new LinkedHashSet<>(Arrays.asList(items));
+  private static Map<String, String> properties(String... items) {
+    final Map<String, String> result = new LinkedHashMap<>();
+    for (int i = 0; i < items.length; i += 2) {
+      result.put(items[i], items[i + 1]);
+    }
+    return result;
   }
 }

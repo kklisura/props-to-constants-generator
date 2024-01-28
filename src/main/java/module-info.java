@@ -1,10 +1,8 @@
-package com.github.kklisura.java.processing.support;
-
 /*-
  * #%L
  * props-to-constants-generator
  * %%
- * Copyright (C) 2018 Kenan Klisura
+ * Copyright (C) 2018 - 2024 Kenan Klisura
  * %%
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,31 +23,10 @@ package com.github.kklisura.java.processing.support;
  * THE SOFTWARE.
  * #L%
  */
+module com.github.kklisura.java.processing {
+  exports com.github.kklisura.java.processing.annotations;
 
-import com.github.kklisura.java.processing.annotations.PropertySourceConstants;
-import java.io.IOException;
-import java.util.Map;
-import javax.annotation.processing.ProcessingEnvironment;
-
-/**
- * Class writer.
- *
- * @author Kenan Klisura
- */
-public interface ClassWriter {
-  /**
-   * Writes a constants class given a class attributes.
-   *
-   * @param packageName Class package name.
-   * @param className Class name.
-   * @param propertyNames Property names.
-   * @param processingEnvironment Processing env.
-   */
-  void writeClass(
-      String packageName,
-      String className,
-      Map<String, String> properties,
-      PropertySourceConstants.Style style,
-      ProcessingEnvironment processingEnvironment)
-      throws IOException;
+  requires org.apache.commons.lang3;
+  requires org.apache.commons.text;
+  requires java.compiler;
 }

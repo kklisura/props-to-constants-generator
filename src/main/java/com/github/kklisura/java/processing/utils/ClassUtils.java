@@ -29,7 +29,6 @@ package com.github.kklisura.java.processing.utils;
 import com.github.kklisura.java.processing.PropertySourceConstantsAnnotationProcessor;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 
@@ -45,7 +44,7 @@ public final class ClassUtils {
   private static final String CLASS =
       "${packageDeclaration}"
           + NEWLINE
-          + "import javax.annotation.Generated;"
+          + "import javax.annotation.processing.Generated;"
           + NEWLINE
           + NEWLINE
           + "@Generated(value = \"${processorName}\")"
@@ -60,8 +59,53 @@ public final class ClassUtils {
           + "}"
           + NEWLINE;
 
+  private static final String ENUM =
+      "${packageDeclaration}"
+          + NEWLINE
+          + "import javax.annotation.processing.Generated;"
+          + NEWLINE
+          + NEWLINE
+          + "@Generated(value = \"${processorName}\")"
+          + NEWLINE
+          + "public enum ${className} {"
+          + NEWLINE
+          + "${enumDeclarations}"
+          + TAB
+          + ";"
+          + NEWLINE
+          + NEWLINE
+          + TAB
+          + "private String key;"
+          + NEWLINE
+          + NEWLINE
+          + TAB
+          + "private ${className}(String key) { this.key = key; }"
+          + NEWLINE
+          + NEWLINE
+          + TAB
+          + "public String getKey() { return this.key; }"
+          + NEWLINE
+          + NEWLINE
+          + TAB
+          + "public String from(java.util.ResourceBundle resourceBundle) { return resourceBundle.getString(this.key); }"
+          + NEWLINE
+          + NEWLINE
+          + TAB
+          + "public String from(java.util.Properties properties) { return properties.getProperty(this.key); }"
+          + NEWLINE
+          + "}"
+          + NEWLINE;
+
   private static final String CONSTANT_DEFINITION =
-      TAB + "public static final String ${name} = \"${value}\";" + NEWLINE;
+      TAB
+          + "/** ${description} */"
+          + NEWLINE
+          + TAB
+          + "public static final String ${name} = \"${value}\";"
+          + NEWLINE;
+
+  private static final String ENUM_DEFINITION =
+      TAB + "/** ${description} */" + NEWLINE + TAB + "${name}(\"${value}\")," + NEWLINE;
 
   /** Private ctor. */
   private ClassUtils() {
@@ -77,16 +121,29 @@ public final class ClassUtils {
    * @return Constants class.
    */
   public static String buildConstantsClass(
-      String packageName, String className, Set<String> propertyNames) {
+      String packageName, String className, Map<String, String> properties) {
     Map<String, String> params = new HashMap<>();
 
     params.put("className", className);
     params.put("processorName", PropertySourceConstantsAnnotationProcessor.class.getName());
-    params.put("constantsDeclarations", buildConstantsDeclarations(propertyNames));
+    params.put("constantsDeclarations", buildConstantsDeclarations(properties));
     params.put("packageDeclaration", buildPackageDeclaration(packageName));
 
     StringSubstitutor substitutor = new StringSubstitutor(params);
     return substitutor.replace(CLASS);
+  }
+
+  public static String buildEnumClass(
+      String packageName, String className, Map<String, String> properties) {
+    Map<String, String> params = new HashMap<>();
+
+    params.put("className", className);
+    params.put("processorName", PropertySourceConstantsAnnotationProcessor.class.getName());
+    params.put("enumDeclarations", buildEnumDeclarations(properties));
+    params.put("packageDeclaration", buildPackageDeclaration(packageName));
+
+    StringSubstitutor substitutor = new StringSubstitutor(params);
+    return substitutor.replace(ENUM);
   }
 
   /**
@@ -95,15 +152,17 @@ public final class ClassUtils {
    * @param propertyNames Property names.
    * @return Constants declaration.
    */
-  public static String buildConstantsDeclarations(final Set<String> propertyNames) {
+  public static String buildConstantsDeclarations(final Map<String, String> properties) {
     StringBuilder stringBuilder = new StringBuilder();
 
-    for (final String propertyName : propertyNames) {
+    for (final Map.Entry<String, String> property : properties.entrySet()) {
+      final String propertyName = property.getKey();
       if (StringUtils.isNotEmpty(propertyName)) {
         Map<String, String> params = new HashMap<>();
 
         params.put("name", propertyNameToConstantName(propertyName));
         params.put("value", propertyName);
+        params.put("description", escapeForComment(property.getValue()));
 
         StringSubstitutor substitutor = new StringSubstitutor(params);
         stringBuilder.append(substitutor.replace(CONSTANT_DEFINITION));
@@ -111,6 +170,30 @@ public final class ClassUtils {
     }
 
     return stringBuilder.toString();
+  }
+
+  public static String buildEnumDeclarations(final Map<String, String> properties) {
+    StringBuilder stringBuilder = new StringBuilder();
+
+    for (final Map.Entry<String, String> property : properties.entrySet()) {
+      final String propertyName = property.getKey();
+      if (StringUtils.isNotEmpty(propertyName)) {
+        Map<String, String> params = new HashMap<>();
+
+        params.put("name", propertyNameToConstantName(propertyName));
+        params.put("value", propertyName);
+        params.put("description", escapeForComment(property.getValue()));
+
+        StringSubstitutor substitutor = new StringSubstitutor(params);
+        stringBuilder.append(substitutor.replace(ENUM_DEFINITION));
+      }
+    }
+
+    return stringBuilder.toString();
+  }
+
+  private static String escapeForComment(String value) {
+    return value.replace("*/", "* /");
   }
 
   /**

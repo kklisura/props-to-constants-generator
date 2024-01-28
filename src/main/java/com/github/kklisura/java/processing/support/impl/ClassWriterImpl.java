@@ -27,12 +27,14 @@ package com.github.kklisura.java.processing.support.impl;
  */
 
 import static com.github.kklisura.java.processing.utils.ClassUtils.buildConstantsClass;
+import static com.github.kklisura.java.processing.utils.ClassUtils.buildEnumClass;
 
+import com.github.kklisura.java.processing.annotations.PropertySourceConstants;
 import com.github.kklisura.java.processing.support.ClassWriter;
 import com.github.kklisura.java.processing.utils.IoUtils;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Set;
+import java.util.Map;
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.ProcessingEnvironment;
 
@@ -46,18 +48,32 @@ public class ClassWriterImpl implements ClassWriter {
   public void writeClass(
       String packageName,
       String className,
-      Set<String> propertyNames,
+      Map<String, String> properties,
+      PropertySourceConstants.Style style,
       ProcessingEnvironment processingEnvironment)
       throws IOException {
 
     Writer classWriter = null;
     try {
+      int lastDot = className.lastIndexOf(".");
+      if (lastDot != -1) {
+        packageName = className.substring(0, lastDot);
+        className = className.substring(lastDot + 1);
+      }
       String name = packageName + "." + className;
       Filer filer = processingEnvironment.getFiler();
 
       classWriter = filer.createSourceFile(name).openWriter();
 
-      classWriter.write(buildConstantsClass(packageName, className, propertyNames));
+      switch (style) {
+        case CONSTANTS:
+          classWriter.write(buildConstantsClass(packageName, className, properties));
+          break;
+        case ENUM:
+          classWriter.write(buildEnumClass(packageName, className, properties));
+          break;
+      }
+
     } finally {
       IoUtils.closeSilently(classWriter);
     }

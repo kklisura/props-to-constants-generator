@@ -44,16 +44,16 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
+    <maven.compiler.source>11</maven.compiler.source>
+    <maven.compiler.target>11</maven.compiler.target>
 
-    <maven.compiler.plugin.version>3.7.0</maven.compiler.plugin.version>
-    <apache.commons.text.version>1.3</apache.commons.text.version>
-    <maven.plugin.annotations.version>3.5.2</maven.plugin.annotations.version>
+    <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
+    <apache.commons.text.version>1.11.0</apache.commons.text.version>
+    <maven.plugin.annotations.version>3.11.0</maven.plugin.annotations.version>
 
-    <junit.version>4.12</junit.version>
-    <jacoco.version>0.8.0</jacoco.version>
-    <easymock.version>3.6</easymock.version>
+    <junit.version>4.13.2</junit.version>
+    <jacoco.version>0.8.11</jacoco.version>
+    <easymock.version>5.2.0</easymock.version>
   </properties>
 
   <dependencies>
@@ -93,7 +93,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
-            <version>2.20.1</version>
+            <version>3.2.5</version>
             <configuration>
               <systemPropertyVariables>
                 <jacoco-agent.destfile>target/jacoco.exec</jacoco-agent.destfile>

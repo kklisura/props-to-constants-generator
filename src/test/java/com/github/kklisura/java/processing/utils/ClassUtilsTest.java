@@ -29,9 +29,8 @@ package com.github.kklisura.java.processing.utils;
 import static com.github.kklisura.java.processing.utils.TestUtils.getFixture;
 import static org.junit.Assert.assertEquals;
 
-import java.util.Arrays;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import org.junit.Test;
 
 /**
@@ -58,7 +57,7 @@ public class ClassUtilsTest {
         ClassUtils.buildConstantsDeclarations(set("message-test")));
 
     assertEquals(
-        constant("MESSAGE_1", "message.1") + constant("MESSAGE_2", "message.2"),
+        constant("MESSAGE_1", "message.1") + constant("MESSAGE_2", "message.2", 1),
         ClassUtils.buildConstantsDeclarations(set("message.1", "message.2")));
   }
 
@@ -80,10 +79,21 @@ public class ClassUtilsTest {
   }
 
   private static String constant(String propertyName, String value) {
-    return String.format("\tpublic static final String %s = \"%s\";\n", propertyName, value);
+    return String.format(
+        "\t/** Value 1 */\n\tpublic static final String %s = \"%s\";\n", propertyName, value);
   }
 
-  private static Set<String> set(String... items) {
-    return new LinkedHashSet<>(Arrays.asList(items));
+  private static String constant(String propertyName, String value, int index) {
+    return String.format(
+        "\t/** Value %d */\n\tpublic static final String %s = \"%s\";\n",
+        index + 1, propertyName, value);
+  }
+
+  private static Map<String, String> set(String... items) {
+    final Map<String, String> result = new LinkedHashMap<>();
+    for (int i = 0; i < items.length; i++) {
+      result.put(items[i], "Value " + (i + 1));
+    }
+    return result;
   }
 }

@@ -61,5 +61,19 @@ public @interface PropertySourceConstants {
    *
    * @return A prefix to be stripped.
    */
-  String stripPrefix();
+  String stripPrefix() default "";
+
+  /**
+   * The style of the output.
+   *
+   * @return
+   */
+  Style style() default Style.CONSTANTS;
+
+  public enum Style {
+    /** Output a class containing static constants. */
+    CONSTANTS,
+    /** Output an enum. */
+    ENUM,
+  }
 }
